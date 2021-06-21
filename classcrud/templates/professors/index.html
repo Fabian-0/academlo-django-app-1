@@ -1,0 +1,42 @@
+{% extends "partials/layout.html" %} {% block content %}
+<div class="container">
+  <div>
+    <nav class="navbar navbar-light bg-light h25">
+      <div class="row w-100 align-items-center">
+        <div class="col-1 avatar h-25 overflow-hidden">
+          <img class="rounded-circle" src="{{ professor.avatar }}" alt="" />
+        </div>
+        <p class="col-2">Professor: {{ professor.first_name }}</p>
+      </div>
+    </nav>
+    <div class="container my-2">
+      <div class="classes-add">
+        <form action="/class/{{ professor.id }}/" class="d-flex my-3" method="POST">
+          {% csrf_token %}
+          <input
+            type="text"
+            class="form-control order-end-0"
+            placeholder="Name"
+            name="name"
+          />
+          <input type="submit" class="btn-primary border-0" value="Add class" />
+        </form>
+      </div>
+      <h2>Classes</h2>
+      <div class="classes-list">
+        <ul class="list-group">
+          {% for class in classes %}
+            <div class="aux row col-12">
+              <li class="list-group-item d-flex justify-content-between">
+                <span
+                  ><a href="/class/{{ class.professor_id }}/details/" class="text-decoration-none">{{ class.name }}</a></span
+                >
+              </li>
+            </div>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "partials/landingpage.html" %}
+{% block content %}
+{% load forms_filters %}
+  {{ form.non_field_errors }}
+  <form action="/register/" method="POST">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-12 mb-4">
+        {{ form.first_name.errors }}
+        {{ form.first_name|addClass:'form-control' }}
+      </div>
+      <div class="col-12 mb-4">
+        {{ form.last_name.errors }}
+        {{ form.last_name|addClass:'form-control' }}
+      </div>
+      <div class="col-12 mb-4">
+        {{ form.email.errors }}
+        {{ form.email|addClass:'form-control' }}
+      </div>
+      <div class="col-12 mb-4">
+        {{ form.avatar.errors }}
+        {{ form.avatar|addClass:'form-control' }}
+      </div>
+      <div class="col-12 mb-4">
+        {{ form.password.errors }}
+        {{ form.password|addClass:'form-control' }}
+      </div>
+      <div class="col-12">
+        {{ form.select_account_type.errors }}
+        {{ form.account_type|addClass:'form-select' }}
+      </div>
+      
+      <div class="col-12 m-auto my-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

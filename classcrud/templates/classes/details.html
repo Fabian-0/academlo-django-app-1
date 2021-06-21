@@ -1,0 +1,25 @@
+{% extends 'partials/layout.html' %}
+{% block content %}
+  <div class="container">
+    <div class="row p-4">
+      <div class="col-lg-2 col-sm-12 col-12">
+        <img src="{{professor.avatar}}" alt="">
+      </div>
+      <div class="col-lg-8 col-sm-12 col-12">
+        <h2>Class Name : {{ class.name }}</h2>
+      </div>
+      <h3>Students</h3>
+      <ul class="list-group">
+        {% for student in students %}
+          <div class="aux row col-12">
+            <li class="list-group-item d-flex justify-content-between">
+              <span
+                ><a href="/class/student/{{ student.id }}/details" class="text-decoration-none">{{ student.first_name }}</a></span
+              >
+            </li>
+          </div>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}

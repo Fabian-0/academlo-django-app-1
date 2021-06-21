@@ -1,0 +1,33 @@
+{% extends 'partials/layout.html' %}
+{% block content %}
+  <div class="container">
+    <div>
+      <nav class="navbar navbar-light bg-light h25">
+        <div class="row w-100 align-items-center">
+          <div class="col-1 avatar h-25 overflow-hidden">
+            <img class="rounded-circle" src="{{ student.avatar }}" alt="">
+          </div>
+          <p class="col-2">Student: {{ student.first_name }}</p>
+        </div>
+      </nav>
+      <div class="container my-2">
+        <a href="/classes/{{ student.id }}" class="btn-primary text-decoration-none px-2 py-1 my-4 d-inline-block">Add Class</a>
+        <h2>My Classes</h2>
+        <div class="classes">
+          <ul class="list-group">
+            {% for class in classes %}
+              <div class="aux row col-12">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span
+                    ><a href="/class/{{ class.professor_id }}/" class="text-decoration-none">{{ class.name }}</a></span
+                  >
+                </li>
+              </div>
+          
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "partials/landingpage.html" %}
+{% block content %}
+{% load forms_filters %}
+  {{ form.non_field_errors }}
+  <form class="row" method="POST" action="/">
+    {% csrf_token %}
+    <div class="col-12">
+      <div class="col-12 mb-3">
+        {{ form.email.errors }}
+        {{ form.email|addClass:'form-control'}}
+      </div>
+      <div class="col-12 mb-3">
+        {{ form.password.errors }}
+        {{ form.password|addClass:'form-control'}}
+      </div>
+      <label class="visually-hidden" for="autoSizingSelect">Preference</label>
+      {{ form.account_type.errors }}
+      {{ form.account_type|addClass:'form-select'}}
+    </div>
+    <div class="col-auto m-auto my-3">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+  <div class="text-start">
+    <a href="register/" class="text-decoration-none text-secondary">Don't have an account yet?</a>
+  </div>
+{% endblock %}

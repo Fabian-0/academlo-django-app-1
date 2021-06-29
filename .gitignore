@@ -1,1 +1,3 @@
 /classcrud_env
+/classcrud_frontend/node_modules
+/classcrud/db.sqlite3

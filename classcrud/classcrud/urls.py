@@ -15,19 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from moduls.landingpage.views import login, register
+from moduls.landingpage.views import getProfile, register
 from moduls.professors.views import professors, classDetails
 from moduls.students.views import students, joinClass
-from moduls.classes.views import addClass, viewClasses, studentDetail
+from moduls.classes.views import ClassViewSet
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from django.views.generic import TemplateView
+
+router = DefaultRouter()
+router.register('classes', ClassViewSet)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', login),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('getProfile/', getProfile),
     path('register/', register),
     path('professor/<int:professorId>/', professors),
     path('student/<int:studentId>/', students),
-    path('class/<int:professorId>/', addClass),
     path('class/<int:classId>/details/', classDetails),
-    path('class/student/<int:studentId>/details/', studentDetail),
     path('student/<int:studentId>/<int:classId>/', joinClass),
-    path('classes/<int:studentId>/', viewClasses ),
-]
+    path('test/', TemplateView.as_view(template_name='index.html'))
+] + router.urls

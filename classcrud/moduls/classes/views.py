@@ -1,46 +1,26 @@
-from django.shortcuts import render, redirect
 from moduls.classes.models import Class
-from moduls.professors.models import Professor
-from moduls.students.models import Student
-# Create your views here.
-
-def viewClasses(request, studentId):
-  httpVerb = request.method
-  if httpVerb == 'GET':
-    classes = Class.objects.filter()
-    context = {
-      "title": "Classes",
-      "classes": classes,
-      "student": studentId
-    }
-    return render(request, '../templates/classes/index.html', context)
+from moduls.classes.serializer import ClassSerializer
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 
-def addClass(request, professorId):
-  httpVerb = request.method
-  if httpVerb == 'POST':
-    dataClass = {
-      "name": request.POST['name'],
-      "professor_id": professorId,
-    }
-    Class.objects.create(**dataClass)
-    return redirect(f'/professor/{professorId}/')
-  if httpVerb == 'GET':
-    professor = Professor.objects.get(id=professorId)
+class ClassViewSet(ModelViewSet):
+  queryset = Class.objects.all()
+  serializer_class = ClassSerializer
+  permission_classes = [AllowAny]
 
-    context = {
-      "title": "Professor Profile",
-      "professor": professor,
-    }
-    return render(request, '../templates/professors/profile.html', context)
+  def get_permissions(self):
+    print(self.request.method)
+    method = self.request.method
+    if method == 'GET':
+      print('test', self.request.user)
+      permissions = (AllowAny, )
+    elif method == 'POST' or method == 'PUT' or method == 'PATCH':
+      permissions = (IsAuthenticated, )
+    elif method == 'DELETE':
+      print(method)
+      permissions = (IsAuthenticated, )
+    else:
+      permissions = (IsAdminUser, )
 
-def studentDetail(request, studentId):
-  httpVerb = request.method
-  if httpVerb == 'GET':
-    student = Student.objects.get(id=studentId)
-    
-    context = {
-      "title": "student Profile",
-      "student": student,
-    }
-    return render(request, '../templates/students/profile.html', context)
+    return [permission() for permission in permissions]

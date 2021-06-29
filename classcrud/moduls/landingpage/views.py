@@ -1,69 +1,57 @@
-from django.shortcuts import render, redirect
-from .forms import Login, Register
-from moduls.students.models import Student
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+from moduls.professors.serializer import SendProfessorSerializer
+from moduls.students.serializer import SendStudentSerializer
+from moduls.landingpage.serializer import UserProfessorSerializer
 from moduls.professors.models import Professor
+from moduls.students.models import Student
+
+
 # Create your views here.
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def getProfile(request):
+  user = request.user
+  try:
+    if user.student:
+      toSend = SendStudentSerializer(user)
+      return Response(status=status.HTTP_200_OK, data=toSend.data)
+  except AttributeError:
+    pass
+  try:
+    if user.professor:
+      toSend = SendProfessorSerializer(user)
+      return Response(status=status.HTTP_200_OK, data=toSend.data)
+  except AttributeError:
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
-def login(request):
-  httpVerb = request.method
-
-  if httpVerb == 'GET':
-    loginForm = Login()
-    context = {
-      "title": "Login",
-      'form': loginForm
-    }
-    return render(request, '../templates/landingpage/login.html', context)
-  if httpVerb == 'POST':
-    loginForm = Login(request.POST)
-
-    if loginForm.is_valid():
-      accoutnType = request.POST["account_type"]
-      try:
-        if accoutnType == 'student':
-          student = Student.objects.get(email=request.POST['email'])
-          if student.password == request.POST['password']:
-            return redirect(f'/student/{student.id}/')
-        if accoutnType == 'professor':
-          professor = Professor.objects.get(email=request.POST['email'])
-          if professor.password == request.POST['password']:
-            return redirect(f'/professor/{professor.id}/')
-        return redirect('/')
-      except:
-        return redirect('/')
+@api_view(['POST'])
+@permission_classes([AllowAny])
 
 def register(request):
+  try:
 
-  httpVerb = request.method
- 
-  if httpVerb == 'GET':
-    registerForm = Register()
-    context = {
-      "title": "Register",
-      "form": registerForm
-    }
-    return render(request, '../templates/landingpage/register.html', context)
-  if httpVerb == 'POST':
-    registerForm = Register(request.POST)
-    if registerForm.is_valid():
-      accoutnType = request.POST["account_type"]
-      dataDict = {
-        "first_name": request.POST["first_name"],
-        "last_name": request.POST["last_name"],
-        "email": request.POST["email"],
-        "avatar": request.POST["avatar"],
-        "password": request.POST["password"],
-      }
+    isValidUser = UserProfessorSerializer(data=request.data)
+    if not isValidUser.is_valid():
+      return Response(status=status.HTTP_400_BAD_REQUEST, data={"errors" : isValidUser.error_messages})
+    
+    userData = {**isValidUser.validated_data}
+    newUser = User.objects.create_user(userData['username'], userData['email'], userData['password'])
+    newUser.first_name = userData['first_name']
+    newUser.last_name = userData['last_name']
+    newUser.save()
 
-      if accoutnType == 'student':
-        Student.objects.create(**dataDict)
-      if accoutnType == 'professor':
-        Professor.objects.create(**dataDict)
-      return redirect('/')
-    else:
-      context = {
-        "title": "Register",
-        "form": registerForm
-      }
-      registerForm = Register(request.POST)
-      return render(request, '../templates/landingpage/register.html', context)
+    if userData["account_type"] == 'professor':
+      Professor.objects.create(user=newUser)
+      return Response(status=status.HTTP_201_CREATED)
+
+    if userData["account_type"] == 'student':
+      Student.objects.create(user=newUser)
+      return Response(status=status.HTTP_201_CREATED)
+    newUser.delete()
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+  except:
+    return Response(status=status.HTTP_400_BAD_REQUEST)

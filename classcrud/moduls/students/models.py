@@ -1,12 +1,9 @@
 from django.db import models
 from moduls.classes.models import Class
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Student(models.Model):
-  first_name = models.CharField(max_length=100)
-  last_name = models.CharField(max_length=100)
-  email = models.EmailField(max_length=100)
+  user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, default=0)
   avatar = models.CharField(max_length=255, default='https://picsum.photos/200/300')
-  password = models.CharField(max_length=15, null=True)
   classes = models.ManyToManyField(Class)
